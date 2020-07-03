@@ -26,6 +26,8 @@
 
 @property (assign, nonatomic) NSUInteger aspectRatio;
 
+@property (assign, nonatomic) CGRect rectBounds;
+
 // Initialization and teardown
 - (void)commonInit;
 
@@ -60,6 +62,7 @@
 		return nil;
     }
     
+    self.rectBounds = self.bounds;
     [self commonInit];
     
     return self;
@@ -235,14 +238,14 @@
     runSynchronouslyOnVideoProcessingQueue(^{
         CGFloat heightScaling, widthScaling;
         
-        CGSize currentViewSize = self.bounds.size;
+        CGSize currentViewSize = self.rectBounds.size;
         
         //    CGFloat imageAspectRatio = inputImageSize.width / inputImageSize.height;
         //    CGFloat viewAspectRatio = currentViewSize.width / currentViewSize.height;
         
-        CGRect insetRect = AVMakeRectWithAspectRatioInsideRect(inputImageSize, self.bounds);
+        CGRect insetRect = AVMakeRectWithAspectRatioInsideRect(self->inputImageSize, self.rectBounds);
         
-        switch(_fillMode)
+        switch(self->_fillMode)
         {
             case kGPUImageFillModeStretch:
             {
@@ -414,15 +417,15 @@
     runSynchronouslyOnVideoProcessingQueue(^{
         CGSize rotatedSize = newSize;
         
-        if (GPUImageRotationSwapsWidthAndHeight(inputRotation))
+        if (GPUImageRotationSwapsWidthAndHeight(self->inputRotation))
         {
             rotatedSize.width = newSize.height;
             rotatedSize.height = newSize.width;
         }
         
-        if (!CGSizeEqualToSize(inputImageSize, rotatedSize))
+        if (!CGSizeEqualToSize(self->inputImageSize, rotatedSize))
         {
-            inputImageSize = rotatedSize;
+            self->inputImageSize = rotatedSize;
             [self recalculateViewGeometry];
         }
     });
